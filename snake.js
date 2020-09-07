@@ -1,15 +1,18 @@
 var canvas;
 var ctx;
 
+//info/item game
 var head;
 var apple;
 var ball;
 var delay = 200;
 var score = 0;
 
-var sfx_appleCoin = new Audio("musiques/Coin02.wav")
-var sfx_gameOver = new Audio("musiques/GameOver01.wav")
-var sfx_musiqueTheme = new Audio("musiques/songbest.mp3")
+// musique
+var sfx_themeOne = 0;
+var sfx_appleCoin = new Audio("musiques/Coin02.wav");
+var sfx_gameOver = new Audio("musiques/metal-gear-solid-game-over-screen-clean-background.mp3");
+var sfx_musiqueTheme = new Audio("musiques/songbest.mp3");
 
 var dots;
 var apple_x;
@@ -21,35 +24,40 @@ var upDirection = false;
 var downDirection = false;
 var inGame = true;  
 
+// info de la map
 const DOT_SIZE = 10;
 const ALL_DOTS = 900;
 const MAX_RAND = 29;
 const C_HEIGHT = 500;
 const C_WIDTH = 500;    
 
+// keyboard
 const LEFT_KEY = 37;
 const RIGHT_KEY = 39;
 const UP_KEY = 38;
 const DOWN_KEY = 40;
+var   oneMove = 0;
 
+// Emplacement du serpent
 var x = new Array(ALL_DOTS);
 var y = new Array(ALL_DOTS);   
 
-
+//initialisation du jeu
 var init = () => {
-    
-    canvas = document.getElementById('myCanvas');
-    ctx = canvas.getContext('2d');
     sfx_appleCoin.volume = 0.05;    
     sfx_gameOver.volume = 0.05;
     sfx_musiqueTheme.volume = 0.05;
     sfx_musiqueTheme.loop = true;
+    
+    canvas = document.getElementById('myCanvas');
+    ctx = canvas.getContext('2d');
     loadImages();
     createSnake();
     locateApple();
     setTimeout("gameCycle()", delay);
 }
 
+//charge les images
 var loadImages = () => {
     
     head = new Image();
@@ -62,6 +70,7 @@ var loadImages = () => {
     apple.src = 'images/apple.png'; 
 }
 
+//creer le snake
 var createSnake = () => {
 
     dots = 3;
@@ -71,6 +80,7 @@ var createSnake = () => {
     }
 }
 
+//Augmente le snake si head est sur apple
 var checkApple = () => {
 
     if ((x[0] == apple_x) && (y[0] == apple_y)) {
@@ -79,7 +89,7 @@ var checkApple = () => {
         locateApple();
     }
 }    
-
+// affiche les images du serpent ou Game Over
 var doDrawing = () => {
     
     ctx.clearRect(0, 0, C_WIDTH, C_HEIGHT);
@@ -103,6 +113,7 @@ var doDrawing = () => {
 }
 
 var gameOver = () => {
+    sfx_musiqueTheme.pause();
     sfx_gameOver.play();
     ctx.fillStyle = 'white';
     ctx.textBaseline = 'middle'; 
@@ -112,12 +123,13 @@ var gameOver = () => {
     ctx.fillText('Game over', C_WIDTH/2, C_HEIGHT/2);
 }
 
+// change le score
 var updateScore = () => {
     sfx_appleCoin.play();
     score++;
     document.getElementById('GFG').innerHTML = "score = " + score;
 }
-
+//verification que la pomme est toujours presente sur la map
 var checkApple = () => {
 
     if ((x[0] == apple_x) && (y[0] == apple_y)) {
@@ -130,7 +142,7 @@ var checkApple = () => {
         }
     }
 }
-
+//deplacement du serpent
 var move = () => {
 
     for (var z = dots; z > 0; z--) {
@@ -154,12 +166,11 @@ var move = () => {
         y[0] += DOT_SIZE;
     }
 }    
-
+// check si le serpent entre en collision avec les murs ou avec lui-meme
 var checkCollision = () => {
 
     for (var z = dots; z > 0; z--) {
-
-        if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
+        if ((z > 3) && (x[0] == x[z]) && (y[0] == y[z])) {
             inGame = false;
         }
     }
@@ -180,7 +191,7 @@ var checkCollision = () => {
       inGame = false;
     }
 }
-
+// ajoute une articulation au snake
 var locateApple = () => {
 
     var r = Math.floor(Math.random() * MAX_RAND);
@@ -189,21 +200,29 @@ var locateApple = () => {
     r = Math.floor(Math.random() * MAX_RAND);
     apple_y = r * DOT_SIZE;
 }    
-
+// gestion de chaque cycle
 var gameCycle = () => {
-    
-    if (inGame) {
-        sfx_musiqueTheme.play();
+
+    if (inGame) {       
+        if (!sfx_themeOne) {
+            sfx_musiqueTheme.play().then(() => {sfx_themeOne++});
+        }   
         checkApple();
         checkCollision();
         move();
         doDrawing();
+        if (oneMove !=0){
+            oneMove--;
+        }
         setTimeout("gameCycle()", delay);
     }
 }
-
+// utilisation du clavier
 onkeydown = (e) => {
-    
+    if (oneMove){
+        return;
+    }
+    oneMove++;
     var key = e.keyCode;
     
     if ((key == LEFT_KEY) && (!rightDirection)) {
