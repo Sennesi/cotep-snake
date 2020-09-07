@@ -1,6 +1,11 @@
 Benjamin Rocher
 
-voilà le travail demandé
+Bonjour Gregory
+voici le travail demandé
+Vraiment intéressant comme test. Cela permet de revoir les bases. 
+J'espere que ce Snake vous amusera
+
+bon jeu
 
 Les bonus :
 
