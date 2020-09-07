@@ -5,6 +5,11 @@ var head;
 var apple;
 var ball;
 var delay = 200;
+var score = 0;
+
+var sfx_appleCoin = new Audio("musiques/Coin02.wav")
+var sfx_gameOver = new Audio("musiques/GameOver01.wav")
+var sfx_musiqueTheme = new Audio("musiques/songbest.mp3")
 
 var dots;
 var apple_x;
@@ -35,12 +40,15 @@ var init = () => {
     
     canvas = document.getElementById('myCanvas');
     ctx = canvas.getContext('2d');
-
+    sfx_appleCoin.volume = 0.05;    
+    sfx_gameOver.volume = 0.05;
+    sfx_musiqueTheme.volume = 0.05;
+    sfx_musiqueTheme.loop = true;
     loadImages();
     createSnake();
     locateApple();
     setTimeout("gameCycle()", delay);
-}    
+}
 
 var loadImages = () => {
     
@@ -57,7 +65,6 @@ var loadImages = () => {
 var createSnake = () => {
 
     dots = 3;
-
     for (var z = 0; z < dots; z++) {
         x[z] = 50 - z * 10;
         y[z] = 50;
@@ -96,7 +103,7 @@ var doDrawing = () => {
 }
 
 var gameOver = () => {
-    
+    sfx_gameOver.play();
     ctx.fillStyle = 'white';
     ctx.textBaseline = 'middle'; 
     ctx.textAlign = 'center'; 
@@ -105,12 +112,19 @@ var gameOver = () => {
     ctx.fillText('Game over', C_WIDTH/2, C_HEIGHT/2);
 }
 
+var updateScore = () => {
+    sfx_appleCoin.play();
+    score++;
+    document.getElementById('GFG').innerHTML = "score = " + score;
+}
+
 var checkApple = () => {
 
     if ((x[0] == apple_x) && (y[0] == apple_y)) {
 
         dots++;
         locateApple();
+        updateScore();
         if (delay > 50) {
             delay = delay - 10;
         }
@@ -179,7 +193,7 @@ var locateApple = () => {
 var gameCycle = () => {
     
     if (inGame) {
-
+        sfx_musiqueTheme.play();
         checkApple();
         checkCollision();
         move();
